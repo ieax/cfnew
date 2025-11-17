@@ -773,151 +773,256 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${t.title}</title>
+        <!-- 引入现代科幻字体 -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+        
         <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body {
-                font-family: "Courier New", monospace;
-                background: #000; color: #00ff00; min-height: 100vh;
-                overflow-x: hidden; position: relative;
-                display: flex; justify-content: center; align-items: center;
+            /* --- 现代科幻风格 Modern Sci-Fi Style --- */
+            :root {
+                --bg-color-dark: #02001A; /* 深邃太空黑 */
+                --bg-color-mid: #0B002B; /* 暗星云紫 */
+                --primary-glow: #00FFFF; /* 核心能量青 */
+                --secondary-glow: #7F00FF; /* 异星紫 */
+                --text-primary: #E0FFFF; /* 全息文本淡青 */
+                --text-secondary: #A0C0FF; /* 系统信息蓝 */
+                --text-accent: #00FFFF; /* 高亮青色 */
+                --error-color: #FF4444; /* 警报红 */
+                --success-color: #44FF44; /* 确认绿 */
+                --font-main: 'Exo 2', sans-serif; /* UI主字体 */
+                --font-mono: 'Roboto Mono', monospace; /* 终端等宽字体 */
             }
+
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            
+            body {
+                font-family: var(--font-main);
+                background: var(--bg-color-dark); 
+                color: var(--text-primary); 
+                min-height: 100vh;
+                overflow-x: hidden; 
+                position: relative;
+                display: flex; 
+                justify-content: center; 
+                align-items: center;
+            }
+
+            /* 替换 .matrix-bg - 动态背景 */
             .matrix-bg {
                 position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: linear-gradient(45deg, #000 0%, #001100 50%, #000 100%);
+                background: radial-gradient(ellipse at bottom, var(--bg-color-mid) 0%, var(--bg-color-dark) 80%);
                 z-index: -1;
-                animation: bg-pulse 8s ease-in-out infinite;
+                animation: bg-pulse 10s ease-in-out infinite;
             }
+
             @keyframes bg-pulse {
-                0%, 100% { background: linear-gradient(45deg, #000 0%, #001100 50%, #000 100%); }
-                50% { background: linear-gradient(45deg, #000 0%, #002200 50%, #000 100%); }
+                0%, 100% { background: radial-gradient(ellipse at bottom, var(--bg-color-mid) 0%, var(--bg-color-dark) 80%); }
+                50% { background: radial-gradient(ellipse at bottom, #10003A 0%, var(--bg-color-dark) 80%); }
             }
+
+            /* 替换 .matrix-rain - 能量网格 */
             .matrix-rain {
                 position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,0,0.03) 2px, rgba(0,255,0,0.03) 4px);
-                animation: matrix-fall 20s linear infinite;
+                background-image: 
+                    linear-gradient(rgba(0, 255, 255, 0.07) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 255, 255, 0.07) 1px, transparent 1px);
+                background-size: 40px 40px;
+                animation: grid-pan 120s linear infinite;
                 z-index: -1;
+                opacity: 0.5;
             }
-            @keyframes matrix-fall {
-                0% { transform: translateY(-100%); }
-                100% { transform: translateY(100vh); }
+
+            @keyframes grid-pan {
+                0% { background-position: 0 0; }
+                100% { background-position: 1200px 1200px; }
             }
-            .matrix-code-rain {
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                pointer-events: none; z-index: -1;
-                overflow: hidden;
-            }
-            .matrix-column {
-                position: absolute; top: -100%; left: 0;
-                color: #00ff00; font-family: "Courier New", monospace;
-                font-size: 14px; line-height: 1.2;
-                animation: matrix-drop 15s linear infinite;
-                text-shadow: 0 0 5px #00ff00;
-            }
-            @keyframes matrix-drop {
-                0% { top: -100%; opacity: 1; }
-                10% { opacity: 1; }
-                90% { opacity: 0.3; }
-                100% { top: 100vh; opacity: 0; }
-            }
-            .matrix-column:nth-child(odd) {
-                animation-duration: 12s;
-                animation-delay: -2s;
-            }
-            .matrix-column:nth-child(even) {
-                animation-duration: 18s;
-                animation-delay: -5s;
-            }
-            .matrix-column:nth-child(3n) {
-                animation-duration: 20s;
-                animation-delay: -8s;
-            }
+
+            /* 隐藏旧的 matrix-code-rain 及其子元素 (JS仍在运行，但视觉上隐藏) */
+            .matrix-code-rain { display: none; }
+            .matrix-column { display: none; }
+
+            /* 终端窗口样式 */
             .terminal {
                 width: 90%; max-width: 800px; height: 500px;
-                background: rgba(0, 0, 0, 0.9);
-                border: 2px solid #00ff00;
-                border-radius: 8px;
-                box-shadow: 0 0 30px rgba(0, 255, 0, 0.5), inset 0 0 20px rgba(0, 255, 0, 0.1);
+                background: rgba(10, 20, 40, 0.85); /* 深蓝色透明背景 */
+                border: 1px solid var(--primary-glow);
+                border-radius: 4px;
+                box-shadow: 0 0 40px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.05);
                 backdrop-filter: blur(10px);
                 position: relative; z-index: 1;
                 overflow: hidden;
+                /* 添加 "切角" 效果 */
+                clip-path: polygon(
+                    10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), 
+                    calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px
+                );
             }
+
+            /* 终端头部 */
             .terminal-header {
-                background: rgba(0, 20, 0, 0.8);
+                background: rgba(0, 255, 255, 0.1); /* 青色辉光 */
                 padding: 10px 15px;
-                border-bottom: 1px solid #00ff00;
+                border-bottom: 1px solid rgba(0, 255, 255, 0.3);
                 display: flex; align-items: center;
             }
+
             .terminal-buttons {
                 display: flex; gap: 8px;
             }
+            
+            /* 重新设计 "mac" 按钮为科技感指示灯 */
             .terminal-button {
-                width: 12px; height: 12px; border-radius: 50%;
-                background: #ff5f57; border: none;
+                width: 10px; height: 10px; border-radius: 50%;
+                background: transparent;
+                border: 1px solid var(--primary-glow);
+                opacity: 0.6;
             }
-            .terminal-button:nth-child(2) { background: #ffbd2e; }
-            .terminal-button:nth-child(3) { background: #28ca42; }
+            .terminal-button:nth-child(1) { box-shadow: 0 0 5px #FF5F57; border-color: #FF5F57; }
+            .terminal-button:nth-child(2) { box-shadow: 0 0 5px #FFBD2E; border-color: #FFBD2E; }
+            .terminal-button:nth-child(3) { box-shadow: 0 0 5px #28CA42; border-color: #28CA42; }
+
             .terminal-title {
-                margin-left: 15px; color: #00ff00;
-                font-size: 14px; font-weight: bold;
+                margin-left: 15px; color: var(--text-accent);
+                font-size: 14px; font-weight: 700;
+                text-shadow: 0 0 8px var(--primary-glow);
+                text-transform: uppercase; /* 标题大写 */
+                letter-spacing: 1px;
             }
+
+            /* 终端主体 */
             .terminal-body {
-                padding: 20px; height: calc(100% - 50px);
-                overflow-y: auto; font-size: 14px;
-                line-height: 1.4;
+                padding: 20px; height: calc(100% - 45px); /* 调整高度以适应头部 */
+                overflow-y: auto; 
+                font-size: 14px;
+                line-height: 1.6;
+                font-family: var(--font-mono); /* 正文使用等宽字体 */
             }
+
             .terminal-line {
-                margin-bottom: 8px; display: flex; align-items: center;
+                margin-bottom: 10px; 
+                display: flex; 
+                align-items: center;
+                flex-wrap: wrap; /* 允许长内容换行 */
             }
+
             .terminal-prompt {
-                color: #00ff00; margin-right: 10px;
-                font-weight: bold;
+                color: var(--text-accent); 
+                margin-right: 10px;
+                font-weight: 700;
+                text-shadow: 0 0 5px var(--primary-glow);
             }
+
+            /* 终端输入框 */
             .terminal-input {
                 background: transparent; border: none; outline: none;
-                color: #00ff00; font-family: "Courier New", monospace;
-                font-size: 14px; flex: 1;
-                caret-color: #00ff00;
+                color: var(--text-primary); 
+                font-family: var(--font-mono);
+                font-size: 14px; 
+                flex: 1;
+                min-width: 200px; /* 确保输入框有最小宽度 */
+                caret-color: var(--primary-glow);
             }
+
             .terminal-input::placeholder {
-                color: #00aa00; opacity: 0.7;
+                color: var(--text-secondary); 
+                opacity: 0.7;
+                font-style: italic;
             }
+
+            /* 重新设计光标 */
             .terminal-cursor {
-                display: inline-block; width: 8px; height: 16px;
-                background: #00ff00; animation: blink 1s infinite;
+                display: inline-block; width: 9px; height: 17px;
+                background: var(--primary-glow); 
+                animation: blink 1.2s infinite;
                 margin-left: 2px;
+                box-shadow: 0 0 8px var(--primary-glow);
+                border-radius: 1px;
             }
+
             @keyframes blink {
-                0%, 50% { opacity: 1; }
-                51%, 100% { opacity: 0; }
+                0%, 50% { background: var(--primary-glow); box-shadow: 0 0 8px var(--primary-glow); }
+                51%, 100% { background: transparent; box-shadow: none; }
             }
+
+            /* 输出文本样式 */
             .terminal-output {
-                color: #00aa00; margin: 5px 0;
+                color: var(--text-primary); /* 主要输出 */
+                margin: 0;
             }
             .terminal-error {
-                color: #ff4444; margin: 5px 0;
+                color: var(--error-color); 
+                margin: 0;
+                text-shadow: 0 0 5px var(--error-color);
             }
             .terminal-success {
-                color: #44ff44; margin: 5px 0;
+                color: var(--success-color); 
+                margin: 0;
+                text-shadow: 0 0 5px var(--success-color);
             }
+
+            /* 重新设计 .matrix-text (右上角文本) */
             .matrix-text {
                 position: fixed; top: 20px; right: 20px;
-                color: #00ff00; font-family: "Courier New", monospace;
-                font-size: 0.8rem; opacity: 0.6;
-                animation: matrix-flicker 3s infinite;
+                color: var(--text-accent); 
+                font-family: var(--font-main);
+                font-size: 0.9rem; 
+                opacity: 0.7;
+                text-shadow: 0 0 5px var(--primary-glow);
+                animation: matrix-flicker 4s ease-in-out infinite;
+                z-index: 100;
             }
+
             @keyframes matrix-flicker {
-                0%, 100% { opacity: 0.6; }
-                50% { opacity: 1; }
+                0%, 100% { opacity: 0.7; text-shadow: 0 0 5px var(--primary-glow); }
+                50% { opacity: 1; text-shadow: 0 0 10px var(--primary-glow); }
+            }
+
+            /* 重新设计 #languageSelector (语言选择器) */
+            #languageSelector {
+                background: rgba(10, 20, 40, 0.9);
+                border: 1px solid var(--primary-glow);
+                color: var(--text-accent);
+                padding: 8px 12px;
+                font-family: var(--font-main);
+                font-size: 14px;
+                cursor: pointer;
+                text-shadow: 0 0 5px var(--primary-glow);
+                box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+                border-radius: 4px;
+                outline: none;
+            }
+            #languageSelector option {
+                background: var(--bg-color-mid);
+                color: var(--text-primary);
+            }
+
+            /* 科幻风格滚动条 */
+            .terminal-body::-webkit-scrollbar {
+                width: 8px;
+            }
+            .terminal-body::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 4px;
+            }
+            .terminal-body::-webkit-scrollbar-thumb {
+                background: var(--primary-glow);
+                border-radius: 4px;
+                box-shadow: 0 0 5px var(--primary-glow);
+            }
+            .terminal-body::-webkit-scrollbar-thumb:hover {
+                background: #80FFFF; /* 悬停时更亮 */
             }
         </style>
     </head>
     <body>
+        <!-- HTML 内容保持不变 -->
         <div class="matrix-bg"></div>
         <div class="matrix-rain"></div>
         <div class="matrix-code-rain" id="matrixCodeRain"></div>
             <div class="matrix-text">${t.terminal}</div>
             <div style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
-                <select id="languageSelector" style="background: rgba(0, 20, 0, 0.9); border: 2px solid #00ff00; color: #00ff00; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; text-shadow: 0 0 5px #00ff00; box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);" onchange="changeLanguage(this.value)">
+                <select id="languageSelector" style="background: rgba(0, 20, 0, 0.9); border: 2px solid #e0ffff; color: #e0ffff; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; text-shadow: 0 0 5px #00ff00; box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);" onchange="changeLanguage(this.value)">
                     <option value="zh" ${!isFarsi ? 'selected' : ''}>🇨🇳 中文</option>
                     <option value="fa" ${isFarsi ? 'selected' : ''}>🇮🇷 فارسی</option>
                 </select>
@@ -933,27 +1038,32 @@
             </div>
             <div class="terminal-body" id="terminalBody">
                 <div class="terminal-line">
-                    <span class="terminal-prompt">root:~$</span>
+                    <span class="terminal-prompt">gofly:~$</span>
                         <span class="terminal-output">${t.congratulations}</span>
                 </div>
                 <div class="terminal-line">
-                    <span class="terminal-prompt">root:~$</span>
+                    <span class="terminal-prompt">gofly:~$</span>
                         <span class="terminal-output">${cp && cp.trim() ? t.enterD : t.enterU}</span>
                 </div>
                 <div class="terminal-line">
-                    <span class="terminal-prompt">root:~$</span>
+                    <span class="terminal-prompt">gofly:~$</span>
                         <span class="terminal-output">${t.command}${cp && cp.trim() ? t.path : t.uuid}]</span>
                 </div>
                 <div class="terminal-line">
-                    <span class="terminal-prompt">root:~$</span>
+                    <span class="terminal-prompt">gofly:~$</span>
                         <input type="text" class="terminal-input" id="uuidInput" placeholder="${cp && cp.trim() ? t.inputD : t.inputU}" autofocus>
                     <span class="terminal-cursor"></span>
                 </div>
             </div>
         </div>
+
+        <!-- JavaScript 脚本保持不变 -->
         <script>
             function createMatrixRain() {
+                // 这个函数仍然会运行，但 .matrix-code-rain 和 .matrix-column 
+                // 在 CSS 中被设置为 display: none，所以不会显示。
                 const matrixContainer = document.getElementById('matrixCodeRain');
+                if (!matrixContainer) return; // 增加安全检查
                 const matrixChars = '01ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
                 const columns = Math.floor(window.innerWidth / 18);
                 
@@ -970,7 +1080,7 @@
                     const charCount = Math.floor(Math.random() * 30 + 20);
                     for (let j = 0; j < charCount; j++) {
                         const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-                        const brightness = Math.random() > 0.1 ? '#00ff00' : '#00aa00';
+                        const brightness = Math.random() > 0.1 ? '#00ff00' : '#00aa00'; // 旧颜色，但不可见
                         text += '<span style="color: ' + brightness + ';">' + char + '</span><br>';
                     }
                     column.innerHTML = text;
@@ -1006,7 +1116,7 @@
                 
                 const prompt = document.createElement('span');
                 prompt.className = 'terminal-prompt';
-                prompt.textContent = 'root:~$';
+                prompt.textContent = 'gofly:~$';
                 
                 const output = document.createElement('span');
                 output.className = 'terminal-' + type;
@@ -1038,7 +1148,7 @@
                             fa: {
                                 connecting: 'در حال اتصال...',
                                 invading: 'در حال نفوذ...',
-                                success: 'اتصال موفق! در حال بازگشت نتیجه...',
+                                success: 'اتصال موفق! در حال بازGشت نتیجه...',
                                 error: 'خطا: فرمت UUID نامعتبر',
                                 reenter: 'لطفا UUID معتبر را دوباره وارد کنید'
                             }
@@ -1121,7 +1231,7 @@
                 });
             
             document.addEventListener('DOMContentLoaded', function() {
-                createMatrixRain();
+                createMatrixRain(); // 旧的函数仍然调用，但无视觉效果
                 
                 const input = document.getElementById('uuidInput');
                 input.focus();
